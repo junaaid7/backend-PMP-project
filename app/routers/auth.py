@@ -5,7 +5,7 @@ from app.dependencies import get_current_user
 from app.schemas import UserResponse
 
 from app.database import get_db
-from app.models import User
+from app.models import User, Organization
 from app.schemas import UserRegister, UserLogin
 from app.security import ( 
     hash_password,
@@ -18,7 +18,6 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
-
 
 @router.post(
     "/register",
@@ -38,9 +37,26 @@ async def register(
 
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=400,
             detail="Email already registered",
         )
+
+    organization_result = await db.execute(
+        select(Organization).where(
+            Organization.name == user_data.organization_name
+        )
+    )
+
+    organization = organization_result.scalar_one_or_none()
+
+    if organization is None:
+        organization = Organization(
+            name=user_data.organization_name
+        )
+
+        db.add(organization)
+
+        await db.flush()
 
     new_user = User(
         name=user_data.name,
@@ -48,6 +64,7 @@ async def register(
         password_hash=hash_password(
             user_data.password
         ),
+        organization_id=organization.id,
     )
 
     db.add(new_user)
@@ -61,7 +78,7 @@ async def register(
         raise
 
     return {
-        "message": "User registered successfully",
+        "message": "User registered successfully"
     }
 
 

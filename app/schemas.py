@@ -13,21 +13,24 @@ class UserUpdate(BaseModel):
     email: str
 
 
+
 class UserRegister(BaseModel):
     name: str
     email: str
     password: str
-
+    organization_name: str
 
 class UserLogin(BaseModel):
     email: str
     password: str
 
 
+
 class UserResponse(BaseModel):
     id: UUID
     name: str
     email: str
+    organization_id: UUID
 
     model_config = ConfigDict(
         from_attributes=True
