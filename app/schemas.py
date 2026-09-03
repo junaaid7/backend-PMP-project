@@ -35,3 +35,26 @@ class UserResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+
+
+class ProjectCreate(BaseModel):
+    name: str
+    description: str | None = None
+
+
+class ProjectUpdate(BaseModel):
+    name: str
+    description: str | None = None
+
+
+class ProjectResponse(BaseModel):
+    id: UUID
+    organization_id: UUID
+    name: str
+    description: str | None
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
