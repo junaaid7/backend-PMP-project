@@ -1,21 +1,17 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from pydantic_settings import BaseSettings
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+)
 
-
-class Settings(BaseSettings):
-    DATABASE_URL: str
-
-    class Config:
-        env_file = ".env"
-
-
-settings = Settings()
+from app.config import settings
 
 
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=True,
 )
+
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,

@@ -10,26 +10,30 @@ from app.schemas import (
     UserCreate,
     UserUpdate,
     UserResponse,
-)
+) 
+
 
 router = APIRouter(
     prefix="/users",
-    tags=["Users"]
+    tags=["Users"],
 )
 
 
 @router.post(
     "/",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_user(
     user: UserCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     new_user = User(
         name=user.name,
-        email=user.email
+        email=user.email,
+        # Temporary:
+        # normal CRUD create ke through password nahi aa rahi
+        password_hash="",
     )
 
     db.add(new_user)
@@ -37,6 +41,7 @@ async def create_user(
     try:
         await db.commit()
         await db.refresh(new_user)
+
     except Exception:
         await db.rollback()
         raise
@@ -44,13 +49,12 @@ async def create_user(
     return new_user
 
 
-
 @router.get(
     "/",
-    response_model=list[UserResponse]
+    response_model=list[UserResponse],
 )
 async def get_users(
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         select(User)
@@ -61,11 +65,11 @@ async def get_users(
 
 @router.get(
     "/{user_id}",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 async def get_user(
     user_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         select(User).where(User.id == user_id)
@@ -76,7 +80,7 @@ async def get_user(
     if user is None:
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     return user
@@ -84,12 +88,12 @@ async def get_user(
 
 @router.put(
     "/{user_id}",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 async def update_user(
     user_id: UUID,
     user_data: UserUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         select(User).where(User.id == user_id)
@@ -100,7 +104,7 @@ async def update_user(
     if user is None:
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     user.name = user_data.name
@@ -109,6 +113,7 @@ async def update_user(
     try:
         await db.commit()
         await db.refresh(user)
+
     except Exception:
         await db.rollback()
         raise
@@ -119,7 +124,7 @@ async def update_user(
 @router.delete("/{user_id}")
 async def delete_user(
     user_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
         select(User).where(User.id == user_id)
@@ -130,21 +135,17 @@ async def delete_user(
     if user is None:
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail="User not found",
         )
 
     try:
         await db.delete(user)
         await db.commit()
+
     except Exception:
         await db.rollback()
         raise
 
     return {
-        "message": "User deleted successfully"
+        "message": "User deleted successfully",
     }
-
-
-
-
-

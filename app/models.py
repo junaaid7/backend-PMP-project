@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-class Base(DeclarativeBase): # Table registry, table metadata, and other features are provided by the DeclarativeBase class.
+class Base(DeclarativeBase):
     pass
 
 
@@ -15,12 +15,19 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid.uuid4
+        default=uuid.uuid4,
     )
 
-    name: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(
+        String(100)
+    )
+
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
-        index=True
+        index=True,
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+        String(255)
     )
