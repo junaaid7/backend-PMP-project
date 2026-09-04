@@ -58,3 +58,28 @@ class ProjectResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
+
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str | None = None
+    project_id: UUID
+
+
+class TaskUpdate(BaseModel):
+    title: str
+    description: str | None = None
+    status: str
+
+
+class TaskResponse(BaseModel):
+    id: UUID
+    organization_id: UUID
+    project_id: UUID
+    title: str
+    description: str | None
+    status: str
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )

@@ -6,6 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine
 from app.models import Base
 from app.routers import auth, users, organizations, projects
+from app.routers import (
+    auth,
+    users,
+    organizations,
+    projects,
+    tasks,
+)
 
 
 @asynccontextmanager
@@ -36,6 +43,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(organizations.router)
 app.include_router(projects.router)
+app.include_router(tasks.router)
 
 
 @app.get("/")
