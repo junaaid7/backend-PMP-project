@@ -5,14 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine
 from app.models import Base
-from app.routers import auth, users, organizations, projects
-from app.routers import (
-    auth,
-    users,
-    organizations,
-    projects,
-    tasks,
-)
+from app.routers import auth, users, organizations, projects, tasks
+
 
 
 @asynccontextmanager

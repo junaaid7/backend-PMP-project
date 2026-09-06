@@ -23,6 +23,7 @@ class Organization(Base):
         unique=True,
     )
 
+
 class User(Base):
     __tablename__ = "users"
 

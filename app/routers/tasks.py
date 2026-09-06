@@ -11,12 +11,14 @@ from app.schemas import (
     TaskCreate,
     TaskUpdate,
     TaskResponse,
+    TaskStatusUpdate
 )
 
 router = APIRouter(
     prefix="/tasks",
     tags=["Tasks"],
 )
+
 
 @router.post(
     "/",
@@ -185,3 +187,68 @@ async def delete_task(
 
 
 
+@router.patch(
+    "/{task_id}/status",
+    response_model=TaskResponse,
+)
+async def update_task_status( 
+    task_id: UUID,
+    task_data: TaskStatusUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Task).where(
+            Task.id == task_id,
+            Task.organization_id
+            == current_user.organization_id,
+        )
+    )
+
+    task = result.scalar_one_or_none()
+
+    if task is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found",
+        )
+
+    try:
+        task.status = TaskStatus(task_data.status)
+
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid task status",
+        )
+
+    try:
+        await db.commit()
+        await db.refresh(task)
+
+    except Exception:
+        await db.rollback()
+        raise
+
+    return task
+
+
+
+
+@router.get(
+    "/project/{project_id}",
+    response_model=list[TaskResponse],
+)
+async def get_project_tasks(
+    project_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Task).where(
+            Task.project_id == project_id,
+            Task.organization_id == current_user.organization_id,
+        )
+    )
+
+    return result.scalars().all()
