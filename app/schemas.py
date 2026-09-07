@@ -31,12 +31,9 @@ class UserResponse(BaseModel):
     name: str
     email: str
     organization_id: UUID
+    role: str
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
-
-
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectCreate(BaseModel):

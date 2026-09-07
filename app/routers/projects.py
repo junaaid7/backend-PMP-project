@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
-from app.models import Project, User
+from app.dependencies import get_current_user, require_roles
+from app.models import Project, User, UserRole
 from app.schemas import (
     ProjectCreate,
     ProjectUpdate,
@@ -27,7 +27,13 @@ router = APIRouter(
 )
 async def create_project(
     project_data: ProjectCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(
+        require_roles(
+        UserRole.OWNER,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+        )
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     project = Project(
@@ -48,7 +54,6 @@ async def create_project(
     return project
 
 
-
 @router.get(
     "/",
     response_model=list[ProjectResponse],
@@ -65,7 +70,6 @@ async def get_projects(
     )
 
     return result.scalars().all()
-
 
 
 @router.get(
@@ -96,7 +100,6 @@ async def get_project(
     return project
 
 
-
 @router.put(
     "/{project_id}",
     response_model=ProjectResponse,
@@ -104,7 +107,13 @@ async def get_project(
 async def update_project(
     project_id: UUID,
     project_data: ProjectUpdate,
-    current_user: User = Depends(get_current_user),
+        current_user: User = Depends(
+        require_roles(
+            UserRole.OWNER,
+            UserRole.ADMIN,
+            UserRole.MANAGER,
+        )
+        ),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -139,7 +148,12 @@ async def update_project(
 @router.delete("/{project_id}")
 async def delete_project(
     project_id: UUID,
-    current_user: User = Depends(get_current_user),
+        current_user: User = Depends(
+        require_roles(
+            UserRole.OWNER,
+            UserRole.ADMIN,
+        )
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -168,11 +182,3 @@ async def delete_project(
     return {
         "message": "Project deleted successfully"
     }
-
-
-
-
-
-
-
-

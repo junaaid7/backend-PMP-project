@@ -5,19 +5,20 @@ from app.dependencies import get_current_user
 from app.schemas import UserResponse
 
 from app.database import get_db
-from app.models import User, Organization
+from app.models import User, Organization, UserRole
 from app.schemas import UserRegister, UserLogin
-from app.security import ( 
+from app.security import (
     hash_password,
     verify_password,
     create_access_token,
 )
 
 
-router = APIRouter( 
+router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+
 
 @router.post(
     "/register",
@@ -65,6 +66,7 @@ async def register(
             user_data.password
         ),
         organization_id=organization.id,
+        role=UserRole.OWNER
     )
 
     db.add(new_user)
@@ -120,6 +122,7 @@ async def login(
         "access_token": access_token,
         "token_type": "bearer",
     }
+
 
 @router.get(
     "/me",

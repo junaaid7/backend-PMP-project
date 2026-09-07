@@ -24,13 +24,20 @@ class Organization(Base):
     )
 
 
+class UserRole(str, Enum):
+    OWNER = "owner"
+    ADMIN = "admin"
+    MANAGER = "manager"
+    DEVELOPER = "developer"
+    VIEWER = "viewer"
+
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid.uuid4
     )
 
     name: Mapped[str] = mapped_column(
@@ -40,7 +47,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
-        index=True,
+        index=True
     )
 
     password_hash: Mapped[str] = mapped_column(
@@ -48,10 +55,16 @@ class User(Base):
     )
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-    UUID(as_uuid=True),
-    ForeignKey("organizations.id"),
-    nullable=False,
-)
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id"),
+        nullable=False,
+    )
+
+    role: Mapped[UserRole] = mapped_column(
+        SQLAlchemyEnum(UserRole),
+        default=UserRole.VIEWER,
+        nullable=False,
+    )
 
 
 
