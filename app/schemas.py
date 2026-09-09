@@ -1,6 +1,6 @@
 from uuid import UUID
-
 from pydantic import BaseModel, ConfigDict
+from app.models import UserRole
 
 
 class UserCreate(BaseModel):
@@ -82,5 +82,35 @@ class TaskResponse(BaseModel):
     )
 
 
+
 class TaskStatusUpdate(BaseModel):
     status: str
+
+
+class MemberResponse(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    organization_id: UUID
+    role: str
+    is_organization_owner: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+
+class MemberRoleUpdate(BaseModel):
+    role: UserRole
+
+
+
+
+
+
+
+
+
+
+
+
+

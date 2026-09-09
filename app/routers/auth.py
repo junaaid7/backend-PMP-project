@@ -49,6 +49,7 @@ async def register(
     )
 
     organization = organization_result.scalar_one_or_none()
+    organization_created = False    
 
     if organization is None:
         organization = Organization(
@@ -56,8 +57,8 @@ async def register(
         )
 
         db.add(organization)
-
         await db.flush()
+        organization_created = True
 
     new_user = User(
         name=user_data.name,
@@ -66,10 +67,19 @@ async def register(
             user_data.password
         ),
         organization_id=organization.id,
-        role=UserRole.OWNER
+        role=(
+        UserRole.OWNER
+        if organization_created
+        else UserRole.VIEWER
+    )
     )
 
     db.add(new_user)
+    await db.flush()
+
+    if organization_created:
+        organization.owner_id = new_user.id
+    
 
     try:
         await db.commit()

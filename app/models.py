@@ -23,6 +23,13 @@ class Organization(Base):
         unique=True,
     )
 
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True,
+    )
+
 
 class UserRole(str, Enum):
     OWNER = "owner"

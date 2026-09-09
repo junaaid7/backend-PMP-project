@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 
-def require_roles(*allowed_roles: UserRole) -> Callable:
+def require_roles(*allowed_roles: UserRole):
 
     async def role_checker(
         current_user: User = Depends(get_current_user)
