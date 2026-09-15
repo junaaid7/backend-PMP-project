@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine
 from app.models import Base
-from app.routers import auth, users, organizations, projects, tasks
+from app.routers import auth, users, organizations, projects, tasks, ai, dashboard
 
 
 
@@ -38,6 +38,8 @@ app.include_router(users.router)
 app.include_router(organizations.router)
 app.include_router(projects.router)
 app.include_router(tasks.router)
+app.include_router(ai.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")
