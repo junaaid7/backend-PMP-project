@@ -38,6 +38,7 @@ class UserRole(str, Enum):
     DEVELOPER = "developer"
     VIEWER = "viewer"
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -74,7 +75,6 @@ class User(Base):
     )
 
 
-
 class Project(Base):
     __tablename__ = "projects"
 
@@ -99,7 +99,6 @@ class Project(Base):
         String(500),
         nullable=True,
     )
-
 
 
 class TaskStatus(str, Enum):
@@ -145,4 +144,9 @@ class Task(Base):
         SQLAlchemyEnum(TaskStatus),
         default=TaskStatus.TODO,
         nullable=False,
+    )
+
+    assigned_user_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=True,
     )
